@@ -1,2 +1,8 @@
+# Ignore local configuration
+whashose.config
+
+# Pycache isn't interesting either
+__pycache__
+
 # Ignore lib
 lib/*

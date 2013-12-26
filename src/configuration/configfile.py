@@ -12,18 +12,26 @@ class ConfigFile(object):
     '''
 
 
-    def __init__(self, configfile):
+    def __init__(self, configfile=None):
         '''
         Courtesy of Yowsup-CLI
         '''
-        if os.path.isfile(configfile):
-            f = open(configfile)
         
         self.phonenumber = ""
         self.password = ""
         
+        if configfile != None:
+            fo = self._openFile(configfile)
+            self._readConfigFile(fo)
+        
+    def _openFile(self, configfile):
+        if os.path.isfile(configfile):
+            return open(configfile)
+        print("Can't open a config file")
+        
+    def _readConfigFile(self, fileObject):
         try:
-            for l in f:
+            for l in fileObject:
                 line = l.strip()
                 if len(line) and line[0] not in ('#', ';'):
                     

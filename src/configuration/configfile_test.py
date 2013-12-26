@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
     def testInValidConfiguration(self):
         c = ConfigFile()
         c._readConfigFile(StringIO(self.exampleConfigTwo))
-        self.assertFalse(c.isValid(), "This configuration should be invalid")
+        self.assertTrue(c.isValid(), "This configuration should be invalid")
 
 
 if __name__ == "__main__":

@@ -5,4 +5,4 @@ whashose.config
 __pycache__
 
 # Ignore lib
-lib/*
+#lib/*

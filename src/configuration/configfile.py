@@ -5,6 +5,7 @@ Created on 25 Dec 2013
 '''
 
 import os
+import logging
 
 class ConfigFile(object):
     '''
@@ -16,6 +17,7 @@ class ConfigFile(object):
         '''
         Courtesy of Yowsup-CLI
         '''
+        self.__log = logging.getLogger(__name__)
         
         self.phonenumber = ""
         self.password = ""
@@ -27,7 +29,7 @@ class ConfigFile(object):
     def _openFile(self, configfile):
         if os.path.isfile(configfile):
             return open(configfile)
-        print("Can't open a config file")
+        self.__log.error("Can't open a config file!")
         
     def _readConfigFile(self, fileObject):
         try:
@@ -48,7 +50,7 @@ class ConfigFile(object):
         except:
             pass
         
-        print("Cannot read a valid configuration file!")
+        self.__log.error("Cannot read a valid configuration file!")
 
 
     def isValid(self):

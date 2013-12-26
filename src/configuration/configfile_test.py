@@ -38,8 +38,3 @@ class Test(unittest.TestCase):
         c = ConfigFile()
         c._readConfigFile(StringIO(self.exampleConfigTwo))
         self.assertFalse(c.isValid(), "This configuration should be invalid")
-
-
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

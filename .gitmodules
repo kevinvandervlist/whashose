@@ -1,0 +1,3 @@
+[submodule "lib/yowsup"]
+	path = lib/yowsup
+	url = git@github.com:kevinvandervlist/yowsup.git

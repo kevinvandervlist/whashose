@@ -8,18 +8,22 @@ import queue
 from messagehandler.messagehandler import NoResponseQueueDefined
 from messagehandler.messagehandler import NoMessageDefined
 from messagehandler.messagehandler import MessageHandler
-from messagehandler.message import InvalidMessageFormat
+from keywordhandler.echohandler import EchoHandler
 
 
 class Test(unittest.TestCase):
 
 
     def setUp(self):
-        q = queue.Queue
-        self.mh = MessageHandler(q)
+        self.queue = queue.Queue()
+        self.mh = MessageHandler(self.queue)
+        
+        # Register the echo handler as well
+        EchoHandler(self.mh)
+        
         self.message_a = "@ help blabla"
         self.message_b = "@ foo"
-        self.message_c = "@"
+        self.message_c = "@ echo my_echo"
 
     def tearDown(self):
         pass
@@ -45,7 +49,8 @@ class Test(unittest.TestCase):
         
     def test_message_a_defined(self):
         self.mh.handle(self.message_a)
-        self.assertTrue(False)
+        m = self.queue.get()
+        self.assertTrue(m.response().string.startswith("Usage information"), "Should provide usage information")
         
         
         
@@ -57,20 +62,29 @@ class Test(unittest.TestCase):
 
     def test_message_b_defined(self):
         self.mh.handle(self.message_b)
-        self.assertTrue(False)
+        self.assertTrue(self.queue.empty())
         
         
         
     def test_tokenize_message_c(self):
-        self.assertRaises(InvalidMessageFormat, lambda: self.mh.tokenize(self.message_c))
+        t = self.mh.tokenize(self.message_c)
+        self.assertEqual("@", t.magic_token(), "Magic token must be '@'")
+        self.assertEqual("echo", t.keyword(), "Keyword must be 'echo'")
+        self.assertEqual("my_echo", t.string(), "String must be 'my_echo'")
         
     def test_message_c_defined(self):
-        self.assertRaises(InvalidMessageFormat, lambda: self.mh.handle(self.message_c))
+        self.mh.handle(self.message_c)
+        m = self.queue.get()
+        self.assertEqual(m.response().string, "my_echo", "Should use the echo handler")
         
 
         
     def test_nondefault_magic_token(self):
-        message = "# foo bar baz"
-        mh = MessageHandler(response_queue = queue.Queue, magic_token = "#")
+        message = "# echo bar baz"
+        q = queue.Queue()
+        mh = MessageHandler(response_queue = q, magic_token = "#")
+        EchoHandler(mh)
+        
         mh.handle(message)
-        self.assertTrue(False)
+        m = q.get()
+        self.assertEqual(m.response().string, "bar baz", "Should use the echo handler")

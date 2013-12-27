@@ -9,6 +9,8 @@ from connector.whatsapp import WhatsAppConnector
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
+    logging.basicConfig(level='INFO')
+    
     log.info("Starting up Whashose...")
     
     cfloc = os.path.dirname(os.path.realpath(__file__)) + "/../whashose.config"

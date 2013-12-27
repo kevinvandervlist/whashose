@@ -5,8 +5,13 @@ Created on 26 Dec 2013
 @author: kevin
 '''
 import unittest
+import logging
 
 if __name__ == "__main__":
+    # We don't really need logging information
+    logging.basicConfig(level='CRITICAL')
+    logging.disabled = True
+    
     result = unittest.TestResult()
     loader = unittest.TestLoader()
     

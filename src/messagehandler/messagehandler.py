@@ -5,7 +5,9 @@ Created on 27 Dec 2013
 '''
 
 import logging
+from messagehandler.basemessagehandler import BaseMessageHandler
 from messagehandler.message import Message
+from messagehandler.message import Response
 from messagehandler.message import InvalidMessageFormat
 
 class NoResponseQueueDefined(Exception):
@@ -28,7 +30,7 @@ class NoMessageDefined(Exception):
     def __str__(self):
         return repr(self.value)
 
-class MessageHandler(object):
+class MessageHandler(BaseMessageHandler):
     '''
     Handler to take care of incoming messages.
     There are a few special rules to take into account:
@@ -52,13 +54,25 @@ class MessageHandler(object):
         '''
         self.__log = logging.getLogger(__name__)
         self.__magic_token = magic_token
+        self.__handlers = dict(help=self)
         
         if response_queue is None:
             err = "No response queue defined"
             self.__log.error(err)
             raise NoResponseQueueDefined(err)
+        self.__response_queue = response_queue
+        
+    def register_handler(self, keyword, handler):
+        '''
+        Register a new message handler with a certain keyword
+        '''
+        if keyword != None and handler != None:
+            self.__handlers[keyword] = handler
         
     def handle(self, message=None):
+        '''
+        Handle an incoming (e.g. raw) message
+        '''
         if message is None:
             err = "Provide a message to handle"
             self.__log.error(err)
@@ -72,7 +86,10 @@ class MessageHandler(object):
             self.__log.info(err)
             self.__log.info("Discarding message" + message)
         
-        # Todo: actually handle message
+        handler = self.__handlers.get(tm.keyword())
+        
+        if handler != None:
+            handler.handle_message(tm, self.__response_queue)
         
     def tokenize(self, message):
         s = message.split(' ', 2)
@@ -85,3 +102,17 @@ class MessageHandler(object):
             return Message(s[0], s[1])
         elif len(s) is 3:
             return Message(s[0], s[1], s[2])
+        
+    def help_message(self):
+        response = ["Usage information:"]
+        
+        for key in self.__handlers:
+            if self.__handlers[key] != self:
+                response.append(self.__handlers[key].help_message())
+        
+        return "\n".join(response)
+    
+    def handle_message(self, message, response_queue):
+        response = Response(self.help_message())
+        message.set_response(response)
+        response_queue.put(message)

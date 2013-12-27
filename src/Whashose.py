@@ -2,6 +2,7 @@
 
 import logging
 import time
+import os
 
 from configuration.configfile import ConfigFile
 from connector.whatsapp import WhatsAppConnector
@@ -9,7 +10,10 @@ from connector.whatsapp import WhatsAppConnector
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
     log.info("Starting up Whashose...")
-    cf = ConfigFile("/home/kevin/src/personal/whashose/whashose.config")
+    
+    cfloc = os.path.dirname(os.path.realpath(__file__)) + "/../whashose.config"
+    cf = ConfigFile(cfloc)
+    
     if not cf.isValid():
         log.error("Invalid configuration file.")
         exit(1)

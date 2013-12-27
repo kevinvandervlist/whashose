@@ -29,12 +29,12 @@ class Test(unittest.TestCase):
         pass
 
 
-    def testValidConfiguration(self):
+    def test_valid_configuration(self):
         c = ConfigFile()
         c._readConfigFile(StringIO(self.exampleConfigOne))
         self.assertTrue(c.isValid(), "This configuration should be valid")
         
-    def testInValidConfiguration(self):
+    def test_invalid_configuration(self):
         c = ConfigFile()
         c._readConfigFile(StringIO(self.exampleConfigTwo))
         self.assertFalse(c.isValid(), "This configuration should be invalid")

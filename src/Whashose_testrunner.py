@@ -15,7 +15,7 @@ if __name__ == "__main__":
     
     if result.wasSuccessful():
         print("Successfull testrun.")
-        print("\tran: \t", result.testsRun, " successfully")
+        print("\tran: \t", result.testsRun, "tests successfully")
         exit(0)
     else:
         print("Testrun failed:")
@@ -25,8 +25,10 @@ if __name__ == "__main__":
         
         if len(result.errors) > 0:
             print("Detailed information on errors:")
-            for err in result.printErrors():
-                print(err)
+            for err in result.errors:
+                test, trace = err
+                print("\nError: ", test)
+                print(trace)
         
         if len(result.failures) > 0:
             print("Detailed information on failures:")

@@ -20,7 +20,6 @@ class EchoHandler(BaseMessageHandler):
         This method is called when a message containing implementers
         classes' keyword is found.
         '''
-        
         response = Response(message.string())
         message.set_response(response)
         response_queue.put(message)

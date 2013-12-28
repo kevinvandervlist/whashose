@@ -69,7 +69,7 @@ class MessageHandler(BaseMessageHandler):
         if keyword != None and handler != None:
             self.__handlers[keyword] = handler
         
-    def handle(self, message=None):
+    def handle(self, source_info, message=None):
         '''
         Handle an incoming (e.g. raw) message
         '''
@@ -77,6 +77,9 @@ class MessageHandler(BaseMessageHandler):
             err = "Provide a message to handle"
             self.__log.error(err)
             raise NoMessageDefined(err)
+        
+        if not message.startswith(self.__magic_token):
+            return
         
         tm = self.tokenize(message)
         
@@ -115,4 +118,9 @@ class MessageHandler(BaseMessageHandler):
     def handle_message(self, message, response_queue):
         response = Response(self.help_message())
         message.set_response(response)
+        
+        # Hack: When we send help messages, make sure only the author 
+        # gets the message, and not a whole group
+        message.source_info().destination = message.source_info().author
+        
         response_queue.put(message)

@@ -56,5 +56,14 @@ class Message(object):
         '''
         return self.__response
     
+    def source_info(self):
+        '''
+        Information on the source of the message. 
+        '''
+        return self.__source_info
+    
     def set_response(self, response):
         self.__response = response
+        
+    def set_source_info(self, source_info):
+        self.__source_info = source_info

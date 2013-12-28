@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
         self.assertTrue(True, "No exception should be raised")
         
     def test_no_message_defined(self):
-        self.assertRaises(NoMessageDefined, lambda: self.mh.handle())
+        self.assertRaises(NoMessageDefined, lambda: self.mh.handle(None, None))
         
         
         
@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
         self.assertEqual("blabla", t.string(), "String must be 'blabla'")
         
     def test_message_a_defined(self):
-        self.mh.handle(self.message_a)
+        self.mh.handle(None, self.message_a)
         m = self.queue.get()
         self.assertTrue(m.response().string.startswith("Usage information"), "Should provide usage information")
         
@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
         self.assertEqual("", t.string(), "String must be empty")
 
     def test_message_b_defined(self):
-        self.mh.handle(self.message_b)
+        self.mh.handle(None, self.message_b)
         self.assertTrue(self.queue.empty())
         
         
@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
         self.assertEqual("my_echo", t.string(), "String must be 'my_echo'")
         
     def test_message_c_defined(self):
-        self.mh.handle(self.message_c)
+        self.mh.handle(None, self.message_c)
         m = self.queue.get()
         self.assertEqual(m.response().string, "my_echo", "Should use the echo handler")
         
@@ -85,6 +85,6 @@ class Test(unittest.TestCase):
         mh = MessageHandler(response_queue = q, magic_token = "#")
         EchoHandler(mh)
         
-        mh.handle(message)
+        mh.handle(None, message)
         m = q.get()
         self.assertEqual(m.response().string, "bar baz", "Should use the echo handler")

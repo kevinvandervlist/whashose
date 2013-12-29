@@ -7,11 +7,13 @@ import os
 from configuration.configfile import ConfigFile
 from connector.whatsapp import WhatsAppConnector
 from connector.whatsapp import WhatsAppMessageMetaInfo
+from connector.whatsapp import WhatsAppImageUploader
 
 import queue
 from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
-from keywordhandler.vrijmibohandler import VrijmiboHandler
+from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler
+from keywordhandler.xkcdhandler import XkcdHandler
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
@@ -34,7 +36,8 @@ if __name__ == '__main__':
     mh = MessageHandler(queue)
     EchoHandler(mh)
     VrijmiboHandler(mh)
-    
+    TettenHandler(mh)
+    XkcdHandler(mh)
     
     def test(messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
         log.debug("Received a message from " + jid + " @ " + str(timestamp) + " (" + pushName + ")")
@@ -96,12 +99,14 @@ if __name__ == '__main__':
         while True:
             m = queue.get()
             jid = m.source_info().destination
+            x = m.response().image
             if m.response().string is not None:
                 response = m.response().string
                 wac.methodInterface.call("message_send", (jid, response))
             elif m.response().image is not None:
-                response = m.response().image
-                wac.methodInterface.call("message_send", (jid, response))
+                imgfp = m.response().image
+                im_up = WhatsAppImageUploader(m.source_info().author, jid, imgfp, wac)
+                im_up.upload()
     except KeyboardInterrupt:
         log.info("Ctrl-C catched -- exitting...")
         wac.disconnect("Ctrl-c pressed")

@@ -4,7 +4,7 @@ Created on 28 Dec 2013
 @author: kevin
 '''
 import unittest
-from keywordhandler.vrijmibohandler import VrijmiboHandler
+from keywordhandler.tumblrhandler import VrijmiboHandler
 from messagehandler.messagehandler import MessageHandlerStub
 from messagehandler.message import Message
 import queue

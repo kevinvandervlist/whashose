@@ -7,7 +7,12 @@ Created on 26 Dec 2013
 import logging
 import base64
 
+import hashlib
+import os
+from PIL import Image
+from io import BytesIO
 from Yowsup.connectionmanager import YowsupConnectionManager
+from Yowsup.Media.uploader import MediaUploader
 
 class WhatsAppMessageMetaInfo(object):
     '''
@@ -22,6 +27,74 @@ class WhatsAppMessageMetaInfo(object):
         self.wants_receipt = wants_receipt
         self.pushname = pushname
         self.is_broadcast = is_broadcast
+
+class WhatsAppImageUploader(object):
+    def __init__(self, from_jid, to_jid, img_fp, wac):
+        self.__log = logging.getLogger(__name__)
+        self.from_jid = from_jid
+        self.to_jid = to_jid
+        self.img_fp = img_fp
+        self.img_path = img_fp.name
+        self.img_name = os.path.basename(img_fp.name)
+        self.methods_interface = wac.methodInterface
+        
+        wac.signalInterface.registerListener("media_uploadRequestSuccess", self.upload_request_success)
+        wac.signalInterface.registerListener("media_uploadRequestFailed", self.upload_request_failed)
+        wac.signalInterface.registerListener("media_uploadRequestDuplicate", self.upload_request_duplicate)
+        
+        self.mtype = "image"
+        self.uploader = MediaUploader(from_jid, to_jid, self.on_upload_success, self.on_error, self.on_progress_updated)
+
+    def upload(self):
+        sha256 = hashlib.sha256()
+        fp = open(self.img_path, 'rb')
+
+        try:
+            im = Image.open(self.img_path)
+            im.thumbnail((128, 128), Image.ANTIALIAS)
+            output = BytesIO()
+            im.save(output, format='JPEG')
+            output.seek(0)
+            self.b64preview = base64.b64encode(output.read())
+            
+            sha256.update(fp.read())
+            _hash = base64.b64encode(sha256.digest())
+            self.size = os.path.getsize(self.img_path)
+            self.methods_interface.call("media_requestUpload", (_hash, self.mtype, self.size))
+        finally:
+            fp.close()
+            
+    def deliverMessage(self, url):
+        self.__log.debug("Trying to deliver message for url:" + url)
+        self.methods_interface.call("message_imageSend", (self.to_jid, url, self.img_name, str(self.size), self.b64preview))
+        self.img_fp.close()
+
+    def upload_request_success(self, _hash, url, resume_from):
+        self.__log.debug("\tUpload request succes:")
+        self.__log.debug(_hash)
+        self.__log.debug(url)
+        self.__log.debug(resume_from)
+        self.uploader.upload(self.img_path, url)
+
+    def upload_request_failed(self, _hash):
+        self.__log.debug("\tUpload request failed:")
+        self.__log.debug(_hash)
+
+    def upload_request_duplicate(self, _hash, url):
+        self.__log.debug("\tDuplicate request: ")
+        self.__log.debug(_hash)
+        self.__log.debug(url)
+        self.deliverMessage(url)
+
+    def on_upload_success(self, url):
+        self.deliverMessage(url)
+
+    def on_error(self):
+        self.__log.debug("\tFailed to upload")
+        self.img_fp.close()
+
+    def on_progress_updated(self, progress):
+        self.__log.debug("\tProgress: " + str(progress))
 
 class WhatsAppConnector(object):
     '''

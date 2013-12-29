@@ -37,15 +37,19 @@ class WhatsAppImageUploader(object):
         self.img_path = img_fp.name
         self.img_name = os.path.basename(img_fp.name)
         self.methods_interface = wac.methodInterface
+        self.fp_dict = dict()
+        self.message_id = None
         
         wac.signalInterface.registerListener("media_uploadRequestSuccess", self.upload_request_success)
         wac.signalInterface.registerListener("media_uploadRequestFailed", self.upload_request_failed)
         wac.signalInterface.registerListener("media_uploadRequestDuplicate", self.upload_request_duplicate)
+        wac.signalInterface.registerListener("receipt_messageSent", self.receipt_message_sent)
         
         self.mtype = "image"
         self.uploader = MediaUploader(from_jid, to_jid, self.on_upload_success, self.on_error, self.on_progress_updated)
 
     def upload(self):
+        self.__log.debug("1) calling upload() for " + self.img_path)
         sha256 = hashlib.sha256()
         fp = open(self.img_path, 'rb')
 
@@ -65,36 +69,49 @@ class WhatsAppImageUploader(object):
             fp.close()
             
     def deliverMessage(self, url):
-        self.__log.debug("Trying to deliver message for url:" + url)
-        self.methods_interface.call("message_imageSend", (self.to_jid, url, self.img_name, str(self.size), self.b64preview))
-        self.img_fp.close()
+        self.__log.debug("4) Trying to deliver message for url:" + url)
+        message_id = self.methods_interface.call("message_imageSend", (self.to_jid, url, self.img_name, str(self.size), self.b64preview))
+        
+        #self.img_fp.close()
+        if self.message_id is not None:
+            self.__log.error("4) Invalid message ID: It is already set: " + self.message_id + "; new: " + message_id)
+        self.message_id = message_id
+        
+    def receipt_message_sent(self, jid, message_id):
+        self.__log.debug("5) receipt_message_sent for message_id: " + message_id)
+        if self.message_id is message_id:
+            self.__log.error("5) Closing and removing fP: " + self.img_path)
+            self.img_fp.close()
+            os.remove(self.img_path)
 
     def upload_request_success(self, _hash, url, resume_from):
-        self.__log.debug("\tUpload request succes:")
+        self.__log.debug("2) Upload request succes for file:" + self.img_path)
         self.__log.debug(_hash)
         self.__log.debug(url)
         self.__log.debug(resume_from)
         self.uploader.upload(self.img_path, url)
 
     def upload_request_failed(self, _hash):
-        self.__log.debug("\tUpload request failed:")
+        self.__log.debug("2) Upload request failed:")
         self.__log.debug(_hash)
 
     def upload_request_duplicate(self, _hash, url):
-        self.__log.debug("\tDuplicate request: ")
+        self.__log.debug("2) Duplicate request: ")
         self.__log.debug(_hash)
         self.__log.debug(url)
         self.deliverMessage(url)
 
     def on_upload_success(self, url):
+        self.__log.debug("3) Successful upload: " + url + "(" + self.img_path + ")")
         self.deliverMessage(url)
 
     def on_error(self):
-        self.__log.debug("\tFailed to upload")
+        self.__log.error("3) Failed to upload, closing file: " + self.img_fp.name)
         self.img_fp.close()
+        os.remove(self.img_path)
 
     def on_progress_updated(self, progress):
-        self.__log.debug("\tProgress: " + str(progress))
+        pass
 
 class WhatsAppConnector(object):
     '''

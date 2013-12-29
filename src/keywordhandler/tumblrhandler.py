@@ -23,7 +23,7 @@ class TumblrDownloader(object):
         soup = bs(urlopen(self.tumblr))
         imgtag = soup.find("img", { "class": tag})
             
-        fh = tempfile.NamedTemporaryFile(suffix=self.suffix, delete=True)
+        fh = tempfile.NamedTemporaryFile(suffix=self.suffix, delete=False)
         
         urlretrieve(imgtag["src"], fh.name)
         
@@ -37,7 +37,7 @@ class TumblrDownloader(object):
             if number_of_images > maximum or number_of_images < 1:
                 number_of_images = 1
         except ValueError:
-            self.__log.info("Invalid number of images: setting 1")
+            self.__log.error("Invalid number of images: setting 1")
             number_of_images = 1
         return number_of_images        
 

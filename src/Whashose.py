@@ -17,7 +17,8 @@ from keywordhandler.xkcdhandler import XkcdHandler
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
-    logging.basicConfig(level='INFO')
+    #logging.basicConfig(level='INFO')
+    logging.basicConfig(filename="/tmp/whashose.log",level=logging.DEBUG)
     
     log.info("Starting up Whashose...")
     

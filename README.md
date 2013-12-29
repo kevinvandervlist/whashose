@@ -4,5 +4,9 @@ This will allow you to setup a shortcode service (like SMS) on a WhatsApp accoun
 
 ### Dependencies:
 * [Yowsup](https://github.com/tgalal/yowsup)
-cd lib; git clone git@github.com:tgalal/yowsup.git
-* BeatifulSoup 4
+git submodule init; git submodule update
+* [BeatifulSoup 4](http://www.crummy.com/software/BeautifulSoup/)
+pip install beautifulsoup4
+* [Pillow](https://pypi.python.org/pypi/Pillow/2.2.2)
+pip install pillow 
+* [Python3-dateutil](

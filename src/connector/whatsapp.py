@@ -57,9 +57,8 @@ class WhatsAppImageUploader(object):
         self.wac.signalInterface.unregisterListener("media_uploadRequestFailed", self.upload_request_failed)
         self.wac.signalInterface.unregisterListener("media_uploadRequestDuplicate", self.upload_request_duplicate)
         self.wac.signalInterface.unregisterListener("receipt_messageSent", self.receipt_message_sent)
-        self.__log.debug("7) Unlocking the lock...")
         self.lock.unlock()
-        self.__log.debug("8) Lock: " + self.lock.locked())
+        self.__log.debug("7) Lock: " + self.lock.locked())
         
     def upload(self, lock):
         self.__log.debug("1) calling upload() for " + self.img_path)

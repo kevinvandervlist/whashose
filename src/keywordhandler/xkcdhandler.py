@@ -36,7 +36,7 @@ class XkcdDownloader(object):
         imgdiv = soup.find("div", { "id": "comic"})
         imgtag = imgdiv.find("img")
             
-        fh = tempfile.NamedTemporaryFile(suffix=self.suffix, delete=True)
+        fh = tempfile.NamedTemporaryFile(suffix=self.suffix, delete=False)
         
         urlretrieve(imgtag["src"], fh.name)
         

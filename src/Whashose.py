@@ -112,6 +112,7 @@ if __name__ == '__main__':
             m = queue.get()
             jid = m.source_info().destination
             x = m.response().image
+            # In case of a text message:
             if m.response().string is not None:
                 response = m.response().string
                 def receipt_message_sent(a, b):
@@ -119,6 +120,7 @@ if __name__ == '__main__':
                     lock.unlock()
                 wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
                 wac.methodInterface.call("message_send", (jid, response))
+            # In case of an image
             elif m.response().image is not None:
                 imgfp = m.response().image
                 im_up = WhatsAppImageUploader(m.source_info().author, jid, imgfp, wac)

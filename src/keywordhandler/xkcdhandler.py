@@ -81,8 +81,8 @@ class XkcdHandler(BaseMessageHandler):
         response = Response(string=text)
         message.set_response(response)
         
-        response_queue.put(message)
         response_queue.put(work)
+        response_queue.put(message)
     
     def help_message(self):
         '''

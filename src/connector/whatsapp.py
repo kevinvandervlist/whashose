@@ -94,7 +94,6 @@ class WhatsAppImageUploader(object):
     def receipt_message_sent(self, jid, message_id):
         self.__log.debug("5) receipt_message_sent for message_id: " + message_id)
         
-        #if self.message_id is message_id:
         self.__log.error("5) Closing and removing fP: " + self.img_path)
         self.cleanup()
 

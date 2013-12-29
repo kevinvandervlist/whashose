@@ -63,7 +63,7 @@ class XkcdHandler(BaseMessageHandler):
             
     def handle_message(self, message, response_queue):
         '''
-        Go and fetch a certain amound of random vrijmibo-worthy photos
+        Go and fetch a certain amount of random vrijmibo-worthy photos
         '''
         self.__log.info("handle_message: " + message.string())
         xkcd = XkcdDownloader()

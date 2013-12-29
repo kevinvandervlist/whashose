@@ -14,6 +14,7 @@ from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
 from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler
 from keywordhandler.xkcdhandler import XkcdHandler
+from keywordhandler.chhandler import CyanideAndHappinessHandler
 
 class JobLock(object):
     def __init__(self):
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     VrijmiboHandler(mh)
     TettenHandler(mh)
     XkcdHandler(mh)
+    CyanideAndHappinessHandler(mh)
     
     def test(messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
         log.debug("Received a message from " + jid + " @ " + str(timestamp) + " (" + pushName + ")")

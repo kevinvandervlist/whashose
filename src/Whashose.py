@@ -11,6 +11,7 @@ from connector.whatsapp import WhatsAppMessageMetaInfo
 import queue
 from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
+from keywordhandler.vrijmibohandler import VrijmiboHandler
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
@@ -32,10 +33,11 @@ if __name__ == '__main__':
     queue = queue.Queue()
     mh = MessageHandler(queue)
     EchoHandler(mh)
+    VrijmiboHandler(mh)
     
     
     def test(messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
-        log.debug("Received a message from " + jid + " @ " + timestamp + " (" + pushName + ")")
+        log.debug("Received a message from " + jid + " @ " + str(timestamp) + " (" + pushName + ")")
         log.debug("Content: " + messageContent)
         
         meta = WhatsAppMessageMetaInfo(mid=messageId, \
@@ -54,7 +56,7 @@ if __name__ == '__main__':
         mh.handle(meta, messageContent)
         
     def grouptest(messageId, jid, author, content, timestamp, wantsReceipt, pushName):
-        log.debug("Received a grop message from " + author + " @ " + timestamp + " (" + pushName + ") in group " + jid)
+        log.debug("Received a grop message from " + author + " @ " + str(timestamp) + " (" + pushName + ") in group " + jid)
         log.debug("Content: " + content)
         
         meta = WhatsAppMessageMetaInfo(mid=messageId, \
@@ -71,8 +73,7 @@ if __name__ == '__main__':
     
     wac.signalInterface.registerListener("message_received", test)
     wac.signalInterface.registerListener("group_messageReceived", grouptest)
-    wac.signalInterface.registerListener("message_received", wac.ack_incoming_message)
-    wac.signalInterface.registerListener("group_messageReceived", wac.ack_incoming_group_message)
+    
     wac.signalInterface.registerListener("group_subjectReceived", wac.ack_incoming_subject_received)
     wac.signalInterface.registerListener("notification_contactProfilePictureUpdated", wac.ack_incoming_notification_contact_profile_picture_updated)
     wac.signalInterface.registerListener("notification_groupParticipantAdded", wac.ack_incoming_notification_group_participant_added)
@@ -95,9 +96,12 @@ if __name__ == '__main__':
         while True:
             m = queue.get()
             jid = m.source_info().destination
-            response = m.response().string
-            
-            wac.methodInterface.call("message_send", (jid, response))
+            if m.response().string is not None:
+                response = m.response().string
+                wac.methodInterface.call("message_send", (jid, response))
+            elif m.response().image is not None:
+                response = m.response().image
+                wac.methodInterface.call("message_send", (jid, response))
     except KeyboardInterrupt:
         log.info("Ctrl-C catched -- exitting...")
         wac.disconnect("Ctrl-c pressed")

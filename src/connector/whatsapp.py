@@ -16,7 +16,7 @@ class WhatsAppMessageMetaInfo(object):
     def __init__(self, mid, author, destination, message, timestamp, wants_receipt, pushname, is_broadcast=False):
         self.mid = mid
         self.author = author
-        self.destintation = destination
+        self.destination = destination
         self.message = message
         self.timestamp = timestamp
         self.wants_receipt = wants_receipt
@@ -125,7 +125,7 @@ class WhatsAppConnector(object):
         if receipt_requested:
             self.methodInterface.call("message_ack", (jid, message_id))
         
-    def ack_incoming_message(self, message_id, jid, content, timestamp, receipt_requested):
+    def ack_incoming_message(self, message_id, jid, message_content, timestamp, receipt_requested, push_name, is_broadcast):
         self.__ack(message_id, jid, receipt_requested)
         
     def ack_incoming_group_message(self, message_id, jid, author, content, timestamp, receipt_requested, push_name):

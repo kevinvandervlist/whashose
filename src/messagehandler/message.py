@@ -17,8 +17,9 @@ class Response(object):
     '''
     Represents a repsonse to a message
     '''
-    def __init__(self, string):
+    def __init__(self, string=None, image=None):
         self.string = string
+        self.image = image
 
 class Message(object):
     '''
@@ -31,6 +32,7 @@ class Message(object):
         self.__keyword = keyword
         self.__string = string
         self.__response = None
+        self.__source_info = None
         
     def magic_token(self):
         '''

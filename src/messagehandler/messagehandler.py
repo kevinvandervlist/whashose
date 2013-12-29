@@ -29,7 +29,11 @@ class NoMessageDefined(Exception):
         self.value = value
     def __str__(self):
         return repr(self.value)
-
+    
+class MessageHandlerStub(BaseMessageHandler):
+    def register_handler(self, keyword, handler):
+        pass
+    
 class MessageHandler(BaseMessageHandler):
     '''
     Handler to take care of incoming messages.
@@ -82,6 +86,7 @@ class MessageHandler(BaseMessageHandler):
             return
         
         tm = self.tokenize(message)
+        tm.set_source_info(source_info)
         
         if tm.magic_token() != self.__magic_token:
             err = "Invalid magic token: " + self.__magic_token + "defined, " \
@@ -121,6 +126,7 @@ class MessageHandler(BaseMessageHandler):
         
         # Hack: When we send help messages, make sure only the author 
         # gets the message, and not a whole group
-        message.source_info().destination = message.source_info().author
+        if message.source_info() != None:
+            message.source_info().destination = message.source_info().author
         
         response_queue.put(message)

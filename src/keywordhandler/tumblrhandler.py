@@ -22,6 +22,9 @@ class TumblrDownloader(object):
     def file_handle(self, tag):
         soup = bs(urlopen(self.tumblr))
         imgtag = soup.find("img", { "class": tag})
+        
+        if imgtag is None:
+            return None
             
         fh = tempfile.NamedTemporaryFile(suffix=self.suffix, delete=False)
         
@@ -59,7 +62,11 @@ class TettenHandler(BaseMessageHandler):
             self.__log.info("Getting image number " + str(x) + " of " + str(number_of_images))
             work = copy.deepcopy(message)
             
-            fh = tumblr.file_handle("main_photo")
+            fh = None
+            tries = 0
+            while fh is None and tries < 3:
+                fh = tumblr.file_handle("main_photo")
+                tries+=1
         
             response = Response(image=fh)
             work.set_response(response)
@@ -98,7 +105,11 @@ class VrijmiboHandler(BaseMessageHandler):
             self.__log.info("Getting image number " + str(x) + " of " + str(number_of_images))
             work = copy.deepcopy(message)
             
-            fh = tumblr.file_handle("notPhotoset")
+            fh = None
+            tries = 0
+            while fh is None and tries < 3:
+                fh = tumblr.file_handle("notPhotoset")
+                tries+=1
         
             response = Response(image=fh)
             work.set_response(response)

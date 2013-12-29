@@ -39,6 +39,7 @@ class WhatsAppImageUploader(object):
         self.methods_interface = wac.methodInterface
         self.fp_dict = dict()
         self.message_id = None
+        self.wac = wac
         
         wac.signalInterface.registerListener("media_uploadRequestSuccess", self.upload_request_success)
         wac.signalInterface.registerListener("media_uploadRequestFailed", self.upload_request_failed)
@@ -47,9 +48,23 @@ class WhatsAppImageUploader(object):
         
         self.mtype = "image"
         self.uploader = MediaUploader(from_jid, to_jid, self.on_upload_success, self.on_error, self.on_progress_updated)
-
-    def upload(self):
+        
+    def cleanup(self):
+        self.__log.error("6) Cleanup for " + self.img_path)
+        self.img_fp.close()
+        os.remove(self.img_path)
+        self.wac.signalInterface.unregisterListener("media_uploadRequestSuccess", self.upload_request_success)
+        self.wac.signalInterface.unregisterListener("media_uploadRequestFailed", self.upload_request_failed)
+        self.wac.signalInterface.unregisterListener("media_uploadRequestDuplicate", self.upload_request_duplicate)
+        self.wac.signalInterface.unregisterListener("receipt_messageSent", self.receipt_message_sent)
+        self.__log.debug("7) Unlocking the lock...")
+        self.lock.unlock()
+        self.__log.debug("8) Lock: " + self.lock.locked())
+        
+    def upload(self, lock):
         self.__log.debug("1) calling upload() for " + self.img_path)
+        self.lock = lock
+        
         sha256 = hashlib.sha256()
         fp = open(self.img_path, 'rb')
 
@@ -79,10 +94,10 @@ class WhatsAppImageUploader(object):
         
     def receipt_message_sent(self, jid, message_id):
         self.__log.debug("5) receipt_message_sent for message_id: " + message_id)
-        if self.message_id is message_id:
-            self.__log.error("5) Closing and removing fP: " + self.img_path)
-            self.img_fp.close()
-            os.remove(self.img_path)
+        
+        #if self.message_id is message_id:
+        self.__log.error("5) Closing and removing fP: " + self.img_path)
+        self.cleanup()
 
     def upload_request_success(self, _hash, url, resume_from):
         self.__log.debug("2) Upload request succes for file:" + self.img_path)
@@ -107,8 +122,7 @@ class WhatsAppImageUploader(object):
 
     def on_error(self):
         self.__log.error("3) Failed to upload, closing file: " + self.img_fp.name)
-        self.img_fp.close()
-        os.remove(self.img_path)
+        self.cleanup()
 
     def on_progress_updated(self, progress):
         pass

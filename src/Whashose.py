@@ -15,6 +15,16 @@ from keywordhandler.echohandler import EchoHandler
 from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler
 from keywordhandler.xkcdhandler import XkcdHandler
 
+class JobLock(object):
+    def __init__(self):
+        self.lock()
+    def locked(self):
+        return self.__lock
+    def lock(self):
+        self.__lock = True
+    def unlock(self):
+        self.__lock = False
+
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
     #logging.basicConfig(level='INFO')
@@ -98,16 +108,22 @@ if __name__ == '__main__':
     
     try:
         while True:
+            lock = JobLock()
             m = queue.get()
             jid = m.source_info().destination
             x = m.response().image
             if m.response().string is not None:
                 response = m.response().string
                 wac.methodInterface.call("message_send", (jid, response))
+                lock.unlock()
             elif m.response().image is not None:
                 imgfp = m.response().image
                 im_up = WhatsAppImageUploader(m.source_info().author, jid, imgfp, wac)
-                im_up.upload()
+                im_up.upload(lock)
+                
+            while lock.locked():
+                log.debug("Waiting for lock...")
+                time.sleep(0.25)
     except KeyboardInterrupt:
         log.info("Ctrl-C catched -- exitting...")
         wac.disconnect("Ctrl-c pressed")

@@ -29,7 +29,10 @@ class JobLock(object):
 if __name__ == '__main__':
     log = logging.getLogger(__name__)
     #logging.basicConfig(level='INFO')
-    logging.basicConfig(filename="/tmp/whashose.log",level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        filename="/tmp/whashose.log")
     
     log.info("Starting up Whashose...")
     

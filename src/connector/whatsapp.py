@@ -9,6 +9,7 @@ import base64
 
 import hashlib
 import os
+import time
 from PIL import Image
 from io import BytesIO
 from Yowsup.connectionmanager import YowsupConnectionManager
@@ -131,7 +132,7 @@ class WhatsAppConnector(object):
     '''
 
 
-    def __init__(self, phonenumber=None, password=None, autopong=True):
+    def __init__(self, phonenumber=None, password=None, autopong=True, reconnect_on_closed=True):
         '''
         Constructor
         '''
@@ -143,6 +144,8 @@ class WhatsAppConnector(object):
         if password is None:
             self.__log.error("No password given.")
             return
+        
+        self.__reconnect_on_closed=reconnect_on_closed
         
         self.__phonenumber = phonenumber
         self.__password = self.__encode_password(password)
@@ -202,6 +205,12 @@ class WhatsAppConnector(object):
         
     def __on_disconnected(self, reason):
         self.__log.info("User " + self.__phonenumber + " disconnected because of reason: " + reason)
+        # If WhatsApp disconnects us, automatically reestablish the connection
+        if reason is "closed" and self.__reconnect_on_closed:
+            self.__log.info("Automatically trying to reestablish the connection...")
+            self.connect()
+            time.sleep(3)
+            self.ready()
         
     # Scaffolding for acks
     def __ack(self, message_id, jid, receipt_requested):

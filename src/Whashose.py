@@ -12,7 +12,7 @@ from connector.whatsapp import WhatsAppImageUploader
 import queue
 from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
-from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler
+from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsClubHandler
 from keywordhandler.xkcdhandler import XkcdHandler
 from keywordhandler.chhandler import CyanideAndHappinessHandler
 
@@ -45,12 +45,14 @@ if __name__ == '__main__':
     wac = WhatsAppConnector(cf.phonenumber, cf.password)
     wac.connect()
     
-    # Initialisation of the handlers we think are interesting 
     queue = queue.Queue()
     mh = MessageHandler(queue)
+
+    # Initialisation of the handlers we think are interesting 
     EchoHandler(mh)
     VrijmiboHandler(mh)
     TettenHandler(mh)
+    BoobsClubHandler(mh)
     XkcdHandler(mh)
     CyanideAndHappinessHandler(mh)
     

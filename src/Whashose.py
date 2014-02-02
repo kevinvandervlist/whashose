@@ -12,7 +12,7 @@ from connector.whatsapp import WhatsAppImageUploader
 import queue
 from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
-from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsClubHandler
+from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsClubHandler, TheLongerViewHandler
 from keywordhandler.xkcdhandler import XkcdHandler
 from keywordhandler.chhandler import CyanideAndHappinessHandler
 
@@ -53,6 +53,7 @@ if __name__ == '__main__':
     VrijmiboHandler(mh)
     TettenHandler(mh)
     BoobsClubHandler(mh)
+    TheLongerViewHandler(mh)
     XkcdHandler(mh)
     CyanideAndHappinessHandler(mh)
     

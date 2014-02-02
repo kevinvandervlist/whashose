@@ -75,6 +75,19 @@ if __name__ == '__main__':
             return
         mh.handle(meta, messageContent)
         
+    def subjecttest(message_id, jid, author, subject, timestamp, receipt_requested):
+        log.debug("Group subject received (" + str(subject) + ") from " + str(jid) + " @ " + str(timestamp) + "(" + str(author) + ")")
+        
+        # Send a help message when we join a group
+        if receipt_requested:
+            wac.methodInterface.call("message_ack", (jid, message_id))
+            
+        def receipt_message_sent(a, b):
+            wac.signalInterface.unregisterListener("receipt_messageSent", receipt_message_sent)
+            
+        wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
+        wac.methodInterface.call("message_send", (jid, "I'm whashose. Send @ help for an explanation."))
+        
     def grouptest(messageId, jid, author, content, timestamp, wantsReceipt, pushName):
         log.debug("Received a grop message from " + author + " @ " + str(timestamp) + " (" + pushName + ") in group " + jid)
         log.debug("Content: " + content)
@@ -94,7 +107,9 @@ if __name__ == '__main__':
     wac.signalInterface.registerListener("message_received", test)
     wac.signalInterface.registerListener("group_messageReceived", grouptest)
     
-    wac.signalInterface.registerListener("group_subjectReceived", wac.ack_incoming_subject_received)
+    # wac.signalInterface.registerListener("group_subjectReceived", wac.ack_incoming_subject_received)
+    wac.signalInterface.registerListener("group_subjectReceived", subjecttest)
+    
     wac.signalInterface.registerListener("notification_contactProfilePictureUpdated", wac.ack_incoming_notification_contact_profile_picture_updated)
     wac.signalInterface.registerListener("notification_groupParticipantAdded", wac.ack_incoming_notification_group_participant_added)
     wac.signalInterface.registerListener("notification_groupParticipantRemoved", wac.ack_incoming_notification_group_participant_removed)
@@ -134,7 +149,7 @@ if __name__ == '__main__':
                 
             while lock.locked():
                 log.debug("Waiting for lock...")
-                time.sleep(0.25)
+                time.sleep(1)
     except KeyboardInterrupt:
         log.info("Ctrl-C catched -- exitting...")
         wac.disconnect("Ctrl-c pressed")

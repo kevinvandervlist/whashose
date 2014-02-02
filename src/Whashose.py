@@ -92,7 +92,7 @@ if __name__ == '__main__':
         wac.methodInterface.call("message_send", (jid, "Hi, I'm whashose. Send a message starting with '@ help' for an explanation on what I can do."))
         
     def grouptest(messageId, jid, author, content, timestamp, wantsReceipt, pushName):
-        log.debug("Received a grop message from " + author + " @ " + str(timestamp) + " (" + pushName + ") in group " + jid)
+        log.debug("Received a group message from " + author + " @ " + str(timestamp) + " (" + pushName + ") in group " + jid)
         log.debug("Content: " + content)
         
         meta = WhatsAppMessageMetaInfo(mid=messageId, \

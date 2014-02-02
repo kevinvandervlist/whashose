@@ -28,10 +28,12 @@ class BaseDistributor(BaseMessageHandler):
         number_of_images = self.validate_number_of_images(10, message.string())
                     
         for x in range(0, number_of_images):
-            self.__log.info("distributing command number " + str(x) + " of " + str(number_of_images))
+            self.__log.debug("distributing command number " + str(x) + " of " + str(number_of_images))
             work = copy.deepcopy(message)
             
             picked_handler = random.choice(self.__handlers)
+            
+            self.__log.debug("Picking handler: " + picked_handler)
             
             self.patch_source_info(work, picked_handler)
             

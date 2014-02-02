@@ -97,6 +97,27 @@ class TheBoobsClubDownloaderStub(TumblrDownloaderStub):
         fh.close()
         return img
     
+class TheLongerViewDownloader(TumblrDownloader):
+    def __init__(self, name):
+        super(TheLongerViewDownloader, self).__init__(name)
+
+    def get_imgtag(self, tag):
+        soup = bs(urlopen(self.tumblr))
+        img = soup.find("img", { "class": tag})
+        img["src"] = img["data-original"]
+
+class TheLongerViewDownloaderStub(TumblrDownloaderStub):
+    def __init__(self, name):
+        super(TheLongerViewDownloaderStub, self).__init__(name)
+
+    def get_imgtag(self, tag):
+        fh = open(self.tumblr_file)
+        soup = bs(fh)
+        img = soup.find("img", {"class": tag})
+        img["src"] = img["data-original"]
+        fh.close()
+        return img
+    
 class TettenHandler(BaseMessageHandler):
     '''
     Handler for tettenvrouw
@@ -215,6 +236,41 @@ class BoobsClubHandler(BaseMessageHandler):
         '''
         return ("boobsclub: theboobsclub voor VVGA\n"
                 "  Syntax: @ boobsclub [num]"
-                "  Speciaal voor VVGA: 'meer bloot'."
                 "  Op iedere 'aanvraag' zit een limiet van 10 fotos."
-                "  Voorbeeld: '@ boobsclub 3' voor 3 fotos\n")
+                "  Voorbeeld: '@ longview 3' voor 3 fotos\n")
+
+class TheLongerViewHandler(BaseMessageHandler):
+    '''
+    The vrijmibo handler
+    '''
+    
+    def __init__(self, message_handler, tumblr = TheLongerViewDownloader("thelongerview")):
+        message_handler.register_handler("longview", self)
+        self.__log = logging.getLogger(__name__)
+        self.tumblr = tumblr
+            
+    def handle_message(self, message, response_queue):
+        self.__log.info("handle_message: " + message.string())
+
+        number_of_images = self.tumblr.validate_number_of_images(10, message.string())
+            
+        for x in range(0, number_of_images):
+            self.__log.info("Getting image number " + str(x) + " of " + str(number_of_images))
+            work = copy.deepcopy(message)
+            
+            fh = None
+            tries = 0
+            while fh is None and tries < 3:
+                fh = self.tumblr.file_handle("focus")
+                tries+=1
+        
+            response = Response(image=fh)
+            work.set_response(response)
+            response_queue.put(work)
+    
+    def help_message(self):
+        return ("longerview: The long view\n"
+                "  Syntax: @ longview [num]"
+                "  Stuur willekeurige vrijmibo-fotos op!\n"
+                "  Op iedere 'aanvraag' zit een limiet van 10 fotos."
+                "  Voorbeeld: '@ vrijmibo 3' voor 3 fotos\n")

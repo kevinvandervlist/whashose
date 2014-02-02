@@ -15,6 +15,7 @@ from keywordhandler.echohandler import EchoHandler
 from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsClubHandler, TheLongerViewHandler
 from keywordhandler.xkcdhandler import XkcdHandler
 from keywordhandler.chhandler import CyanideAndHappinessHandler
+from keywordhandler.distributor import ChickDistributor
 
 class JobLock(object):
     def __init__(self):
@@ -56,6 +57,7 @@ if __name__ == '__main__':
     TheLongerViewHandler(mh)
     XkcdHandler(mh)
     CyanideAndHappinessHandler(mh)
+    ChickDistributor(mh)
     
     def test(messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
         log.debug("Received a message from " + jid + " @ " + str(timestamp) + " (" + pushName + ")")

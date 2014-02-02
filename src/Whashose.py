@@ -31,7 +31,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename="/tmp/whashose.log")
+                        filename="/var/log/whashose.log")
     
     log.info("Starting up Whashose...")
     

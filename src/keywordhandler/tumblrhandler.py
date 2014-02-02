@@ -74,7 +74,29 @@ class TumblrDownloaderStub(BaseTumblrDownloader):
         if imgtag is None:
             return None
         return imgtag["src"]
+    
+    
+class TheBoobsClubDownloader(TumblrDownloader):
+    def __init__(self, name):
+        super(TheBoobsClubDownloader, self).__init__(name)
 
+    def get_imgtag(self, tag):
+        soup = bs(urlopen(self.tumblr))
+        div = soup.find("div", { "class": tag})
+        return div.find("img")
+
+class TheBoobsClubDownloaderStub(TumblrDownloaderStub):
+    def __init__(self, name):
+        super(TheBoobsClubDownloaderStub, self).__init__(name)
+
+    def get_imgtag(self, tag):
+        fh = open(self.tumblr_file)
+        soup = bs(fh)
+        div = soup.find("div", {"class": tag})
+        img = div.find("img")
+        fh.close()
+        return img
+    
 class TettenHandler(BaseMessageHandler):
     '''
     Handler for tettenvrouw
@@ -162,7 +184,7 @@ class BoobsClubHandler(BaseMessageHandler):
     The boobsclub handler voor VVGA
     '''
     
-    def __init__(self, message_handler, tumblr = TumblrDownloader("theboobsclub")):
+    def __init__(self, message_handler, tumblr = TheBoobsClubDownloader("theboobsclub")):
         message_handler.register_handler("boobsclub", self)
         self.__log = logging.getLogger(__name__)
         self.tumblr = tumblr
@@ -179,7 +201,7 @@ class BoobsClubHandler(BaseMessageHandler):
             fh = None
             tries = 0
             while fh is None and tries < 3:
-                fh = self.tumblr.file_handle("notPhotoset")
+                fh = self.tumblr.file_handle("the-photo")
                 tries+=1
         
             response = Response(image=fh)

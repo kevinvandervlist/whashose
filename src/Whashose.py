@@ -86,7 +86,7 @@ if __name__ == '__main__':
             wac.signalInterface.unregisterListener("receipt_messageSent", receipt_message_sent)
             
         wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
-        wac.methodInterface.call("message_send", (jid, "I'm whashose. Send @ help for an explanation."))
+        wac.methodInterface.call("message_send", (jid, "Hi, I'm whashose. Send a message starting with '@ help' for an explanation on what I can do."))
         
     def grouptest(messageId, jid, author, content, timestamp, wantsReceipt, pushName):
         log.debug("Received a grop message from " + author + " @ " + str(timestamp) + " (" + pushName + ") in group " + jid)

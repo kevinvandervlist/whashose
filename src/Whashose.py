@@ -83,10 +83,10 @@ if __name__ == '__main__':
         if receipt_requested:
             wac.methodInterface.call("message_ack", (jid, message_id))
             
-        def receipt_message_sent(a, b):
-            wac.signalInterface.unregisterListener("receipt_messageSent", receipt_message_sent)
+        def subject_message_sent(a, b):
+            wac.signalInterface.unregisterListener("receipt_messageSent", subject_message_sent)
             
-        wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
+        wac.signalInterface.registerListener("receipt_messageSent", subject_message_sent)
         wac.methodInterface.call("message_send", (jid, "Hi, I'm whashose. Send a message starting with '@ help' for an explanation on what I can do."))
         
     def grouptest(messageId, jid, author, content, timestamp, wantsReceipt, pushName):
@@ -147,6 +147,10 @@ if __name__ == '__main__':
                 imgfp = m.response().image
                 im_up = WhatsAppImageUploader(m.source_info().author, jid, imgfp, wac)
                 im_up.upload(lock)
+            else:
+                msg = "ERROR: Message is not provided with a valid response..."
+                log.debug(msg)
+                raise Exception(msg)
                 
             while lock.locked():
                 log.debug("Waiting for lock...")

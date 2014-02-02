@@ -105,6 +105,7 @@ class TheLongerViewDownloader(TumblrDownloader):
         soup = bs(urlopen(self.tumblr))
         img = soup.find("img", { "class": tag})
         img["src"] = img["data-original"]
+        return img
 
 class TheLongerViewDownloaderStub(TumblrDownloaderStub):
     def __init__(self, name):
@@ -240,10 +241,6 @@ class BoobsClubHandler(BaseMessageHandler):
                 "  Voorbeeld: '@ longview 3' voor 3 fotos\n")
 
 class TheLongerViewHandler(BaseMessageHandler):
-    '''
-    The vrijmibo handler
-    '''
-    
     def __init__(self, message_handler, tumblr = TheLongerViewDownloader("thelongerview")):
         message_handler.register_handler("longview", self)
         self.__log = logging.getLogger(__name__)

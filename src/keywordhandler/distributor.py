@@ -43,7 +43,19 @@ class BaseDistributor(BaseMessageHandler):
         """
         si = message.source_info()
         si.message = new_text
-        message.set_source_info(message)
+        message.set_source_info(si)
+        
+    def validate_number_of_images(self, maximum, given):
+        number_of_images = 0
+        try:
+            number_of_images = int(given)
+            self.__log.info("Received a request for " + str(number_of_images) + " images.")
+            if number_of_images > maximum or number_of_images < 1:
+                number_of_images = 1
+        except ValueError:
+            self.__log.error("Invalid number of images: setting 1")
+            number_of_images = 1
+        return number_of_images
         
     def help_message(self):
         '''

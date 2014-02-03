@@ -100,9 +100,15 @@ class MessageHandler(BaseMessageHandler):
             try:
                 handler.handle_message(tm, self.__response_queue)
             except:
-                self.__log.debug("A handler failed with an error, rescue what we can..")
+                self.__log.error("A handler failed with an error, rescue what we can..")
                 err = "@ echo Sorry, something went wrong. I can't handle that request right now."
                 self.handle(source_info, err)
+        else:
+            message = "Sorry, I don't understand the command " + tm.keyword()
+            self.__log.info(message)
+            err = "@ echo " + message
+            self.handle(source_info, err)
+                
         
     def tokenize(self, message):
         s = message.split(' ', 2)

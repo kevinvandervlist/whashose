@@ -100,7 +100,7 @@ class MessageHandler(BaseMessageHandler):
             try:
                 handler.handle_message(tm, self.__response_queue)
             except:
-                self.__log.debug("A handler failed with an error")
+                self.__log.debug("A handler failed with an error, rescue what we can..")
                 err = "@ echo Sorry, something went wrong. I can't handle that request right now."
                 self.handle(source_info, err)
         

@@ -28,6 +28,14 @@ class WhatsAppMessageMetaInfo(object):
         self.wants_receipt = wants_receipt
         self.pushname = pushname
         self.is_broadcast = is_broadcast
+        
+    def __str__(self):
+        return ("MessageID:" + self.mid + 
+                ", Author: " + self.author + 
+                ", Destination" + self.destination +
+                ", Message" + self.message +
+                ", timestamp" + self.timestamp +
+                ", pushname" + self.pushname)
 
 class WhatsAppImageUploader(object):
     def __init__(self, from_jid, to_jid, img_fp, wac):

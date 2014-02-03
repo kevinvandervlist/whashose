@@ -16,6 +16,7 @@ from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsCl
 from keywordhandler.xkcdhandler import XkcdHandler
 from keywordhandler.chhandler import CyanideAndHappinessHandler
 from keywordhandler.distributor import ChickDistributor
+from keywordhandler.suggestion import SuggestionHandler
 
 class JobLock(object):
     def __init__(self):
@@ -61,6 +62,7 @@ if __name__ == '__main__':
     XkcdHandler(mh)
     CyanideAndHappinessHandler(mh)
     ChickDistributor(mh)
+    SuggestionHandler(mh)
     
     def test(messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
         log.debug("Received a message from " + jid + " @ " + str(timestamp) + " (" + pushName + ")")

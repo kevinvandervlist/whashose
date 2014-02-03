@@ -21,7 +21,7 @@ class SuggestionHandler(BaseMessageHandler):
         string = "Thank you for your suggestion. I'll have a look at it."
         
         conn_info = str(message.source_info())
-        self.__log.info("Suggestion: " + message.string() + conn_info)
+        self.__log.info("Suggestion: " + message.string() + " ("+ conn_info + ")")
         
         response = Response(string)
         message.set_response(response)

@@ -135,8 +135,8 @@ if __name__ == '__main__':
     
     try:
         while True:
-            lock = JobLock()
             m = queue.get()
+            lock = JobLock()
             jid = m.source_info().destination
             x = m.response().image
             # In case of a text message:

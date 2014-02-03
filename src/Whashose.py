@@ -20,12 +20,15 @@ from keywordhandler.distributor import ChickDistributor
 class JobLock(object):
     def __init__(self):
         self.lock()
+        self.__time = time.time()
     def locked(self):
         return self.__lock
     def lock(self):
         self.__lock = True
     def unlock(self):
         self.__lock = False
+    def time(self):
+        return self.__time
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)

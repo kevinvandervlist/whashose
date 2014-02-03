@@ -20,7 +20,8 @@ class SuggestionHandler(BaseMessageHandler):
     def handle_message(self, message, response_queue):
         string = "Thank you for your suggestion. I'll have a look at it."
         
-        self.__log.info("Suggestion: " + message.string() + str(message.source_info()))
+        conn_info = str(message.source_info())
+        self.__log.info("Suggestion: " + message.string() + conn_info)
         
         response = Response(string)
         message.set_response(response)

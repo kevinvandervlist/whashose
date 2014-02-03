@@ -155,6 +155,13 @@ if __name__ == '__main__':
                 raise Exception(msg)
                 
             while lock.locked():
+                if (time.time() - lock.time()) > 30:
+                    
+                    log.error("ERROR: This probably is a race condition, we are still waiting on the lock. Exitting...")
+                    wac.disconnect("We probably detected a race condition")
+                    time.sleep(2)
+                    exit(1);
+                    
                 log.debug("Waiting for lock...")
                 time.sleep(1)
     except KeyboardInterrupt:

@@ -62,6 +62,8 @@ class Test(unittest.TestCase):
 
     def test_message_b_defined(self):
         self.mh.handle(None, self.message_b)
+        m = self.queue.get()
+        self.assertTrue(m.response().string.startswith("Sorry, I don't understand the command"), "Should provide usage information")
         self.assertTrue(self.queue.empty())
         
         

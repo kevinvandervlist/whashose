@@ -93,22 +93,25 @@ class MessageHandler(BaseMessageHandler):
              + tm.magic_token() + " found in message"
             self.__log.info(err)
             self.__log.info("Discarding message" + message)
-        
-        handler = self.__handlers.get(tm.keyword())
+            
+        self.__handler(tm, source_info)
+            
+    def __handler(self, tokenized_message, source_info):
+        "Actual plumbing with calling handlers or returning notifications about failures"         
+        handler = self.__handlers.get(tokenized_message.keyword())
         
         if handler != None:
             try:
-                handler.handle_message(tm, self.__response_queue)
+                handler.handle_message(tokenized_message, self.__response_queue)
             except:
                 self.__log.error("A handler failed with an error, rescue what we can..")
                 err = "@ echo Sorry, something went wrong. I can't handle that request right now."
                 self.handle(source_info, err)
         else:
-            message = "Sorry, I don't understand the command " + tm.keyword()
+            message = "Sorry, I don't understand the command " + tokenized_message.keyword()
             self.__log.info(message)
             err = "@ echo " + message
             self.handle(source_info, err)
-                
         
     def tokenize(self, message):
         s = message.split(' ', 2)

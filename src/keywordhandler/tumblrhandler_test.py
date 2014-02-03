@@ -150,7 +150,7 @@ class TheLongerViewHandlerTest(unittest.TestCase):
     def setUp(self):
         self.stub = MessageHandlerStub()
         tumblr = th.TheLongerViewDownloaderStub("thelongerview")
-        self.expected = "http://24.media.tumblr.com/tumblr_ly6oagKzi61qbbnjqo1_1280.jpg"
+        self.expected = "http://25.media.tumblr.com/tumblr_lxxm9cG04V1r5kt3io1_1280.jpg"
         self.longview = th.TheLongerViewHandler(self.stub, tumblr)
         self.queue = queue.Queue()
         

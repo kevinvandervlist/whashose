@@ -9,10 +9,10 @@ import logging
 
 if __name__ == "__main__":
     # We don't really need logging information
-    logging.basicConfig(level=logging.CRITICAL,
+    logging.basicConfig(level=logging.ERROR,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%a, %d %b %Y %H:%M:%S')
-    logging.disabled = True
+    logging.disabled = False
     
     result = unittest.TestResult()
     loader = unittest.TestLoader()

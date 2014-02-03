@@ -103,9 +103,8 @@ class TheLongerViewDownloader(TumblrDownloader):
 
     def get_imgtag(self, tag):
         soup = bs(urlopen(self.tumblr))
-        img = soup.find("img", { "class": tag})
-        img["src"] = img["data-original"]
-        return img
+        div = soup.find("div", { "class": tag})
+        return div.find("img")
 
 class TheLongerViewDownloaderStub(TumblrDownloaderStub):
     def __init__(self, name):
@@ -114,8 +113,8 @@ class TheLongerViewDownloaderStub(TumblrDownloaderStub):
     def get_imgtag(self, tag):
         fh = open(self.tumblr_file)
         soup = bs(fh)
-        img = soup.find("img", {"class": tag})
-        img["src"] = img["data-original"]
+        div = soup.find("div", {"class": tag})
+        img = div.find("img")
         fh.close()
         return img
     
@@ -258,7 +257,11 @@ class TheLongerViewHandler(BaseMessageHandler):
             fh = None
             tries = 0
             while fh is None and tries < 3:
-                fh = self.tumblr.file_handle("focus")
+                try:
+                    fh = self.tumblr.file_handle("photo")
+                except TypeError:
+                    self.__log.error("Cannot retrieve a file handle for " + __name__ + "...")
+                    return
                 tries+=1
         
             response = Response(image=fh)

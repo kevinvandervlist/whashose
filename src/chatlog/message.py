@@ -25,13 +25,16 @@ class BaseMessageStatistics(BaseStatisticsEntry):
     
     __metaclas__ = ABCMeta
     
-    def __init__(self, message = None, source_jid = None, push_name = None, timestamp = None, author = source_jid):
+    def __init__(self, message = None, source_jid = None, push_name = None, timestamp = None, author = None):
         super(BaseMessageStatistics, self).__init__()
         self.__message = message
         self.__source_jid = source_jid
-        self.__author = author
         self.__timestamp = timestamp
         self.__push_name = push_name
+        if author is None:
+            self.__author = source_jid
+        else:
+            self.__author = author
         
     def message(self):
         return self.__message
@@ -58,7 +61,7 @@ class BaseMessageStatistics(BaseStatisticsEntry):
         return self.__timestamp
     
     def push_name(self):
-        return self.__pushname
+        return self.__push_name
     
     def set_push_name(self, name):
         self.__push_name = name
@@ -72,7 +75,7 @@ class GroupMessageStatistics(BaseMessageStatistics):
         log.info("Group Message," + str(self))
         
     def __str__(self):
-        str(self.__message) + "," + str(self.__source_jid) + "," + str(self.__push_name) + "," + str(self.__timestamp) + "," + str(self.__author) 
+        return str(self.message()) + "," + str(self.source_jid()) + "," + str(self.push_name()) + "," + str(self.timestamp()) + "," + str(self.author()) 
 
 
 class MessageStatistics(BaseMessageStatistics):
@@ -84,4 +87,4 @@ class MessageStatistics(BaseMessageStatistics):
         log.info("Message," + str(self))
         
     def __str__(self):
-        str(self.__message) + "," + str(self.__source_jid) + "," + str(self.__push_name) + "," + str(self.__timestamp) + "," + str(self.__author)
+        return str(self.message()) + "," + str(self.source_jid()) + "," + str(self.push_name()) + "," + str(self.timestamp())

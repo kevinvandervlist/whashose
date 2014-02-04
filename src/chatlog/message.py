@@ -4,7 +4,7 @@ Created on 3 Feb 2014
 @author: kevin
 '''
 
-from statistics.base import BaseStatisticsEntry
+from chatlog.base import BaseStatisticsEntry
 from abc import ABCMeta
 import logging
 

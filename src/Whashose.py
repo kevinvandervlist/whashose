@@ -17,6 +17,7 @@ from keywordhandler.xkcdhandler import XkcdHandler
 from keywordhandler.chhandler import CyanideAndHappinessHandler
 from keywordhandler.distributor import ChickDistributor
 from keywordhandler.suggestion import SuggestionHandler
+import chatlog.message as chatlog
 
 class JobLock(object):
     def __init__(self):
@@ -37,6 +38,8 @@ if __name__ == '__main__':
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%a, %d %b %Y %H:%M:%S',
                         filename="/var/log/whashose.log")
+    chatlog.SetupLog()
+
     
     log.info("Starting up Whashose...")
     
@@ -77,6 +80,9 @@ if __name__ == '__main__':
                                        pushname=pushName, \
                                        is_broadcast=isBroadCast)
         
+        m = chatlog.MessageStatistics(messageContent, jid, pushName, timestamp)
+        m.store()
+        
         if wantsReceipt:
             wac.methodInterface.call("message_ack", (jid, messageId))
         if isBroadCast:
@@ -107,6 +113,9 @@ if __name__ == '__main__':
                                        timestamp=timestamp, \
                                        wants_receipt=wantsReceipt, \
                                        pushname=pushName)
+        
+        m = chatlog.GroupMessageStatistics(content, jid, pushName, timestamp, author)
+        m.store()
         
         if wantsReceipt:
             wac.methodInterface.call("message_ack", (jid, messageId))

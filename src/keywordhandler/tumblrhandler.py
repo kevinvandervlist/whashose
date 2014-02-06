@@ -258,7 +258,7 @@ class TheLongerViewHandler(BaseMessageHandler):
             tries = 0
             while fh is None and tries < 3:
                 try:
-                    fh = self.tumblr.file_handle("photo")
+                    fh = self.tumblr.file_handle("media")
                 except TypeError:
                     self.__log.error("Cannot retrieve a file handle for " + __name__ + "...")
                     return

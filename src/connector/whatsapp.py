@@ -204,7 +204,7 @@ class WhatsAppConnector(object):
         '''
         Disconnect from the WhatsApp servers
         '''
-        self.__log.info("User ", self.__phonenumber, " will try to disconnect because of reason: " + reason)
+        self.__log.info("User " + self.__phonenumber + " will try to disconnect because of reason: " + reason)
         self.methodInterface.call("disconnect", (reason, ))
     
     def __on_auth_success(self, username):

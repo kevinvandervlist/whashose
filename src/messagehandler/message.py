@@ -51,9 +51,9 @@ class Message(object):
         si = self.source_info()
         response = self.response()
         if self.string is not None:
-            response.handle_string(whatsappconnector, si.jid, lock)
+            response.handle_string(whatsappconnector, si.destination, lock)
         elif self.image is not None:
-            response.handle_image(whatsappconnector, si.author, si.jid, lock)
+            response.handle_image(whatsappconnector, si.author, si.destination, lock)
         else:
             msg = "ERROR: Message is not provided with a valid response..."
             raise Exception(msg)

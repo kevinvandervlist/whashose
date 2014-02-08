@@ -4,6 +4,8 @@ Created on 27 Dec 2013
 @author: kevin
 '''
 
+from connector.whatsapp import WhatsAppImageUploader
+
 class InvalidMessageFormat(Exception):
     '''
     Custom exception, thrown a message is not in a correct format
@@ -20,6 +22,17 @@ class Response(object):
     def __init__(self, string=None, image=None):
         self.string = string
         self.image = image
+        
+    def handle_string(self, wac, jid, lock):
+        def receipt_message_sent(a, b):
+            wac.signalInterface.unregisterListener("receipt_messageSent", receipt_message_sent)
+            lock.unlock()
+        wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
+        wac.methodInterface.call("message_send", (jid, self.string))
+        
+    def handle_image(self, wac, author, jid, lock):
+        im_up = WhatsAppImageUploader(author, jid, self.image, wac)
+        im_up.upload(lock)
 
 class Message(object):
     '''
@@ -33,6 +46,17 @@ class Message(object):
         self.__string = string
         self.__response = None
         self.__source_info = None
+        
+    def handle(self, whatsappconnector, lock):
+        si = self.source_info()
+        response = self.response()
+        if self.string is not None:
+            response.handle_string(whatsappconnector, si.jid, lock)
+        elif self.image is not None:
+            response.handle_image(whatsappconnector, si.author, si.jid, lock)
+        else:
+            msg = "ERROR: Message is not provided with a valid response..."
+            raise Exception(msg)
         
     def magic_token(self):
         '''

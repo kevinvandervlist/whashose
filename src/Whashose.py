@@ -3,13 +3,14 @@
 import logging
 import time
 import os
+import signal
 
 from configuration.configfile import ConfigFile
 from connector.whatsapp import WhatsAppConnector
 from connector.whatsapp import WhatsAppMessageMetaInfo
-from connector.whatsapp import WhatsAppImageUploader
 
 import queue
+from queue import Empty
 from messagehandler.messagehandler import MessageHandler
 from keywordhandler.echohandler import EchoHandler
 from keywordhandler.tumblrhandler import VrijmiboHandler, TettenHandler, BoobsClubHandler, TheLongerViewHandler
@@ -18,6 +19,9 @@ from keywordhandler.chhandler import CyanideAndHappinessHandler
 from keywordhandler.distributor import ChickDistributor
 from keywordhandler.suggestion import SuggestionHandler
 import chatlog.message as chatlog
+
+class SigIntState(object):
+    has_to_stop = False
 
 class JobLock(object):
     def __init__(self):
@@ -144,43 +148,36 @@ if __name__ == '__main__':
     
     wac.ready()
     
+    def signal_handler(signal, frame):
+        SigIntState.has_to_stop = True
+        log.info("Caught a SIGINT signal")
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    
+    def shutdown(message):
+        log.info(message)
+        wac.disconnect(message)
+        time.sleep(3)
+        exit(0)
+    
     try:
         while True:
-            m = queue.get()
-            lock = JobLock()
-            jid = m.source_info().destination
-            x = m.response().image
-            # In case of a text message:
-            if m.response().string is not None:
-                response = m.response().string
-                def receipt_message_sent(a, b):
-                    wac.signalInterface.unregisterListener("receipt_messageSent", receipt_message_sent)
-                    lock.unlock()
-                wac.signalInterface.registerListener("receipt_messageSent", receipt_message_sent)
-                wac.methodInterface.call("message_send", (jid, response))
-            # In case of an image
-            elif m.response().image is not None:
-                imgfp = m.response().image
-                im_up = WhatsAppImageUploader(m.source_info().author, jid, imgfp, wac)
-                im_up.upload(lock)
-            else:
-                msg = "ERROR: Message is not provided with a valid response..."
-                log.debug(msg)
-                raise Exception(msg)
+            try:
+                message = queue.get(False, 5)
+                lock = JobLock()
+                message.handle(wac, lock)
                 
-            while lock.locked():
-                if (time.time() - lock.time()) > 30:
-                    
-                    log.error("ERROR: This probably is a race condition, we are still waiting on the lock. Exitting...")
-                    wac.disconnect("We probably detected a race condition")
-                    time.sleep(2)
-                    exit(1);
-                    
-                log.debug("Waiting for lock...")
-                time.sleep(1)
+                while lock.locked():
+                    if (time.time() - lock.time()) > 30:
+                        log.error("ERROR: This probably is a race condition, we are still waiting on the lock. Exitting...")
+                        shutdown("Race condition -- shutting down")
+                    log.debug("Waiting for lock...")
+                    time.sleep(1)
+            except Empty:
+                # Currently we have an emtpy queue
+                # Was there a kill signal, asking us to stop?
+                if SigIntState.has_to_stop:
+                    shutdown("SIGINT caught -- shutting down")
+                          
     except KeyboardInterrupt:
-        log.info("Ctrl-C catched -- exitting...")
-        wac.disconnect("Ctrl-c pressed")
-        time.sleep(3)
-        
-    exit(0)
+        shutdown("Keyboard interrupt -- shutting down")

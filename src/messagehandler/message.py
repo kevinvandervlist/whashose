@@ -50,7 +50,7 @@ class Message(object):
     def handle(self, whatsappconnector, lock):
         si = self.source_info()
         response = self.response()
-        if self.string is not None:
+        if response.string is not None:
             response.handle_string(whatsappconnector, si.destination, lock)
         elif self.image is not None:
             response.handle_image(whatsappconnector, si.author, si.destination, lock)

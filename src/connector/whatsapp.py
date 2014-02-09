@@ -255,7 +255,7 @@ class WhatsAppConnector(object):
     def ack_incoming_subject_received(self, message_id, jid, author, subject, timestamp, receipt_requested):
         self.__ack(message_id, jid, receipt_requested)
         
-    def ack_incoming_notification_contact_profile_picture_updated(self, jid, timestamp, message_id, receipt_requested):
+    def ack_incoming_notification_contact_profile_picture_updated(self, jid, timestamp, message_id, picture_id, receipt_requested):
         self.__ack(message_id, jid, receipt_requested)
         
     def ack_incoming_notification_group_participant_added(self, group_jid, jid, author, timestamp, message_id, receipt_requested):

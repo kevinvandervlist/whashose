@@ -89,8 +89,13 @@ class WhatsAppImageUploader(object):
             _hash = base64.b64encode(sha256.digest())
             self.size = os.path.getsize(self.img_path)
             self.methods_interface.call("media_requestUpload", (_hash, self.mtype, self.size))
-        finally:
             fp.close()
+        except IOError:
+            self.__log.error("Caught an IOError. cancelling upload...")
+            self.cleanup()
+        except:
+            self.__log.error("Caught a generic error in file upload...")
+            self.cleanup()
             
     def deliverMessage(self, url):
         self.__log.debug("4) Trying to deliver message for url:" + url)

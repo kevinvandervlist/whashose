@@ -112,7 +112,7 @@ class MessageHandler(BaseMessageHandler):
                 err = "@ echo Sorry, something went wrong. I can't handle that request right now."
                 self.handle(source_info, err)
         else:
-            message = "Sorry, I don't understand the command " + tokenized_message.keyword()
+            message = "Sorry, I don't understand the command '" + tokenized_message.keyword() + "'. Type '@ help' for a usage information."
             self.__log.info(message)
             err = "@ echo " + message
             self.handle(source_info, err)

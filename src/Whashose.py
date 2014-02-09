@@ -144,7 +144,20 @@ if __name__ == '__main__':
     wac.signalInterface.registerListener("group_videoReceived", wac.ack_incoming_media_group_video_received)
     wac.signalInterface.registerListener("group_audioReceived", wac.ack_incoming_media_group_audio_received)
     wac.signalInterface.registerListener("group_locationReceived", wac.ack_incoming_media_group_location_received)
-    wac.signalInterface.registerListener("group_vcardReceived", wac.ack_incoming_media_group_vcard_received)    
+    wac.signalInterface.registerListener("group_vcardReceived", wac.ack_incoming_media_group_vcard_received)
+    
+    def shutdown(message):
+        log.info(message)
+        wac.disconnect(message)
+        time.sleep(3)
+        exit(0)
+        
+    def disconnect_shutdown():
+        log.error("Got disconnected again...")
+        time.sleep(3)
+        exit(1)
+    
+    wac.signalInterface.registerListener("disconnected", disconnect_shutdown)
     
     wac.ready()
     
@@ -153,12 +166,6 @@ if __name__ == '__main__':
         log.info("Caught a SIGINT signal")
     
     signal.signal(signal.SIGINT, signal_handler)
-    
-    def shutdown(message):
-        log.info(message)
-        wac.disconnect(message)
-        time.sleep(3)
-        exit(0)
     
     try:
         while True:

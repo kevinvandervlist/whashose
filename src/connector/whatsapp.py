@@ -174,7 +174,6 @@ class WhatsAppConnector(object):
         '''
         self.signalInterface.registerListener("auth_fail", self.__on_auth_failed)
         self.signalInterface.registerListener("auth_success", self.__on_auth_success)
-        self.signalInterface.registerListener("disconnected", self.__on_disconnected)
         
         
     def __encode_password(self, password):
@@ -211,15 +210,6 @@ class WhatsAppConnector(object):
         
     def __on_auth_failed(self, username, err):
         self.__log.error("Can't login " + username + " because of error: " + err)
-        
-    def __on_disconnected(self, reason):
-        self.__log.info("User " + self.__phonenumber + " disconnected because of reason: " + reason)
-        # If WhatsApp disconnects us, automatically reestablish the connection
-        if reason is "closed" and self.__reconnect_on_closed:
-            self.__log.info("Automatically trying to reestablish the connection...")
-            self.connect()
-            time.sleep(3)
-            self.ready()
         
     # Scaffolding for acks
     def __ack(self, message_id, jid, receipt_requested):

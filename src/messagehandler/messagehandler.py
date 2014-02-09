@@ -85,7 +85,11 @@ class MessageHandler(BaseMessageHandler):
         if not message.startswith(self.__magic_token):
             return
         
-        tm = self.tokenize(message)
+        try:
+            tm = self.tokenize(message)
+        except InvalidMessageFormat:
+            return
+        
         tm.set_source_info(source_info)
         
         if tm.magic_token() != self.__magic_token:

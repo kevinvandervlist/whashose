@@ -152,8 +152,9 @@ if __name__ == '__main__':
         time.sleep(3)
         exit(0)
         
-    def disconnect_shutdown():
+    def disconnect_shutdown(arg):
         log.error("Got disconnected again...")
+        log.error("Reason: " + str(arg))
         time.sleep(3)
         exit(1)
     

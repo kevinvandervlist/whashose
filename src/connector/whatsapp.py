@@ -80,8 +80,7 @@ class WhatsAppImageUploader(object):
             im = Image.open(self.img_path)
             im.thumbnail((128, 128), Image.ANTIALIAS)
             output = BytesIO()
-            if im.mode != "RGB":
-                im.convert("RGB")
+            im.convert("RGB")
             im.save(output, format='JPEG')
             output.seek(0)
             self.b64preview = base64.b64encode(output.read())
